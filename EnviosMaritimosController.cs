@@ -15,6 +15,7 @@ public class EnviosMaritimosController : ControllerBase
         _envioMaritimoRepository = envioMaritimoRepository;
     }
 
+    // Obtener todos los envíos marítimos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvioMaritimo>>> GetEnviosMaritimos()
     {
@@ -22,6 +23,7 @@ public class EnviosMaritimosController : ControllerBase
         return Ok(envios);
     }
 
+    // Obtener un envío marítimo por ID
     [HttpGet("{id}")]
     public async Task<ActionResult<EnvioMaritimo>> GetEnvioMaritimo(int id)
     {
@@ -35,13 +37,20 @@ public class EnviosMaritimosController : ControllerBase
         return Ok(envio);
     }
 
+    // Crear un nuevo envío marítimo
     [HttpPost]
     public async Task<ActionResult<EnvioMaritimo>> PostEnvioMaritimo(EnvioMaritimo envioMaritimo)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var nuevoEnvio = await _envioMaritimoRepository.CreateAsync(envioMaritimo);
         return CreatedAtAction(nameof(GetEnvioMaritimo), new { id = nuevoEnvio.EnvioMaritimoID }, nuevoEnvio);
     }
 
+    // Actualizar un envío marítimo existente
     [HttpPut("{id}")]
     public async Task<IActionResult> PutEnvioMaritimo(int id, EnvioMaritimo envioMaritimo)
     {
@@ -50,11 +59,32 @@ public class EnviosMaritimosController : ControllerBase
             return BadRequest();
         }
 
-        await _envioMaritimoRepository.UpdateAsync(envioMaritimo);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await _envioMaritimoRepository.UpdateAsync(envioMaritimo);
+        }
+        catch (System.Exception)
+        {
+            var exists = await _envioMaritimoRepository.GetByIdAsync(id) != null;
+            if (!exists)
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
 
         return NoContent();
     }
 
+    // Eliminar un envío marítimo
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEnvioMaritimo(int id)
     {

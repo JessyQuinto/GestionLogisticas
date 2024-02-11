@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendApiLogistica.Data.Models; // Asegúrate de que el namespace sea correcto
-using BackendApiLogistica.Repositories;
+using BackendApiLogistica.Repositories.Interfaces;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -40,15 +40,20 @@ public class PuertosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Puerto>> PostPuerto(Puerto puerto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         await _puertoRepository.CreateAsync(puerto);
-        return CreatedAtAction("GetPuerto", new { id = puerto.PuertoID }, puerto);
+        return CreatedAtAction(nameof(GetPuerto), new { id = puerto.PuertoID }, puerto);
     }
 
     // PUT: api/Puertos/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutPuerto(int id, Puerto puerto)
     {
-        if (id != puerto.PuertoID)
+        if (id != puerto.PuertoID || !ModelState.IsValid)
         {
             return BadRequest();
         }
@@ -62,6 +67,12 @@ public class PuertosController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePuerto(int id)
     {
+        var existingPuerto = await _puertoRepository.GetByIdAsync(id);
+        if (existingPuerto == null)
+        {
+            return NotFound();
+        }
+
         await _puertoRepository.DeleteAsync(id);
         return NoContent();
     }

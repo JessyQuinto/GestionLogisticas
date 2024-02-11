@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendApiLogistica.Data.Models;
 using BackendApiLogistica.Repositories.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -38,6 +39,11 @@ public class EnviosTerrestresController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<EnvioTerrestre>> PostEnvioTerrestre(EnvioTerrestre envioTerrestre)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         var nuevoEnvio = await _envioTerrestreRepository.CreateAsync(envioTerrestre);
         return CreatedAtAction(nameof(GetEnvioTerrestre), new { id = nuevoEnvio.EnvioTerrestreID }, nuevoEnvio);
     }
@@ -50,7 +56,19 @@ public class EnviosTerrestresController : ControllerBase
             return BadRequest();
         }
 
-        await _envioTerrestreRepository.UpdateAsync(envioTerrestre);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await _envioTerrestreRepository.UpdateAsync(envioTerrestre);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
         return NoContent();
     }

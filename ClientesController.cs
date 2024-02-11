@@ -1,11 +1,9 @@
 ﻿using BackendApiLogistica.Data.Models;
 using BackendApiLogistica.Repositories.Interfaces;
-using BackendApiLogistica.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
 
 [Route("api/[controller]")]
 [ApiController]
@@ -36,7 +34,6 @@ public class ClientesController : ControllerBase
         return CreatedAtAction(nameof(GetClienteById), new { id = nuevoCliente.ClienteID }, nuevoCliente);
     }
 
-
     [HttpGet("{id}")]
     public async Task<ActionResult<Cliente>> GetClienteById(int id)
     {
@@ -53,7 +50,7 @@ public class ClientesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> PutCliente(int id, [FromBody] Cliente cliente)
     {
-        if (id != cliente.ClienteID)
+        if (id != cliente.ClienteID || !ModelState.IsValid)
         {
             return BadRequest();
         }
@@ -64,7 +61,7 @@ public class ClientesController : ControllerBase
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!ClienteExists(id))
+            if (!await ClienteExists(id))
             {
                 return NotFound();
             }
@@ -77,9 +74,9 @@ public class ClientesController : ControllerBase
         return NoContent();
     }
 
-    private bool ClienteExists(int id)
+    private async Task<bool> ClienteExists(int id)
     {
-        return _clienteRepository.GetByIdAsync(id) != null;
+        return await _clienteRepository.GetByIdAsync(id) != null;
     }
 
     [HttpDelete("{id}")]
@@ -95,7 +92,4 @@ public class ClientesController : ControllerBase
 
         return NoContent();
     }
-
-
-
 }

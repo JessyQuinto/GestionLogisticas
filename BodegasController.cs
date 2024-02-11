@@ -15,7 +15,6 @@ public class BodegasController : ControllerBase
         _bodegaRepository = bodegaRepository;
     }
 
-    // GET: api/Bodegas
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Bodega>>> GetBodegas()
     {
@@ -23,43 +22,56 @@ public class BodegasController : ControllerBase
         return Ok(bodegas);
     }
 
-    // GET: api/Bodegas/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Bodega>> GetBodega(int id)
     {
         var bodega = await _bodegaRepository.GetByIdAsync(id);
-
         if (bodega == null)
         {
             return NotFound();
         }
-
         return Ok(bodega);
     }
 
-    // POST: api/Bodegas
     [HttpPost]
     public async Task<ActionResult<Bodega>> PostBodega(Bodega bodega)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         await _bodegaRepository.CreateAsync(bodega);
         return CreatedAtAction(nameof(GetBodega), new { id = bodega.BodegaID }, bodega);
     }
 
-    // PUT: api/Bodegas/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutBodega(int id, Bodega bodega)
     {
-        if (id != bodega.BodegaID)
+        if (id != bodega.BodegaID || !ModelState.IsValid)
         {
             return BadRequest();
         }
 
-        await _bodegaRepository.UpdateAsync(bodega);
+        try
+        {
+            await _bodegaRepository.UpdateAsync(bodega);
+        }
+        catch (System.Exception)
+        {
+            if (!await BodegaExists(id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
 
         return NoContent();
     }
 
-    // DELETE: api/Bodegas/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBodega(int id)
     {
@@ -70,7 +82,12 @@ public class BodegasController : ControllerBase
         }
 
         await _bodegaRepository.DeleteAsync(id);
-
         return NoContent();
+    }
+
+    private async Task<bool> BodegaExists(int id)
+    {
+        var bodega = await _bodegaRepository.GetByIdAsync(id);
+        return bodega != null;
     }
 }

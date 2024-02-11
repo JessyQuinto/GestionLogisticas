@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -16,12 +17,14 @@ public class ProductosController : ControllerBase
         _productoRepository = productoRepository;
     }
 
+    // Obtener todos los productos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
     {
         return Ok(await _productoRepository.GetAllAsync());
     }
 
+    // Obtener un producto por ID
     [HttpGet("{id}")]
     public async Task<ActionResult<Producto>> GetProductoById(int id)
     {
@@ -33,6 +36,7 @@ public class ProductosController : ControllerBase
         return producto;
     }
 
+    // Crear un nuevo producto
     [HttpPost]
     public async Task<ActionResult<Producto>> PostProducto([FromBody] Producto producto)
     {
@@ -44,10 +48,11 @@ public class ProductosController : ControllerBase
         return CreatedAtAction(nameof(GetProductoById), new { id = nuevoProducto.ProductoID }, nuevoProducto);
     }
 
+    // Actualizar un producto existente
     [HttpPut("{id}")]
     public async Task<IActionResult> PutProducto(int id, [FromBody] Producto producto)
     {
-        if (id != producto.ProductoID)
+        if (id != producto.ProductoID || !ModelState.IsValid)
         {
             return BadRequest();
         }
@@ -58,7 +63,7 @@ public class ProductosController : ControllerBase
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!ProductoExists(id))
+            if (!await ProductoExists(id))
             {
                 return NotFound();
             }
@@ -71,6 +76,7 @@ public class ProductosController : ControllerBase
         return NoContent();
     }
 
+    // Eliminar un producto
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProducto(int id)
     {
@@ -85,8 +91,9 @@ public class ProductosController : ControllerBase
         return NoContent();
     }
 
-    private bool ProductoExists(int id)
+    private async Task<bool> ProductoExists(int id)
     {
-        return _productoRepository.GetByIdAsync(id) != null;
+        var producto = await _productoRepository.GetByIdAsync(id);
+        return producto != null;
     }
 }
