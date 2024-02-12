@@ -11,11 +11,13 @@ public class EnviosTerrestresController : ControllerBase
 {
     private readonly IEnvioTerrestreRepository _envioTerrestreRepository;
 
+    // Inyecta el repositorio
     public EnviosTerrestresController(IEnvioTerrestreRepository envioTerrestreRepository)
     {
         _envioTerrestreRepository = envioTerrestreRepository;
     }
 
+    // Obtiene todos los envíos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvioTerrestre>>> GetEnviosTerrestres()
     {
@@ -23,6 +25,7 @@ public class EnviosTerrestresController : ControllerBase
         return Ok(envios);
     }
 
+    // Busca un envío por ID
     [HttpGet("{id}")]
     public async Task<ActionResult<EnvioTerrestre>> GetEnvioTerrestre(int id)
     {
@@ -36,6 +39,7 @@ public class EnviosTerrestresController : ControllerBase
         return Ok(envio);
     }
 
+    // Crea un nuevo envío
     [HttpPost]
     public async Task<ActionResult<EnvioTerrestre>> PostEnvioTerrestre(EnvioTerrestre envioTerrestre)
     {
@@ -48,6 +52,7 @@ public class EnviosTerrestresController : ControllerBase
         return CreatedAtAction(nameof(GetEnvioTerrestre), new { id = nuevoEnvio.EnvioTerrestreID }, nuevoEnvio);
     }
 
+    // Actualiza un envío existente
     [HttpPut("{id}")]
     public async Task<IActionResult> PutEnvioTerrestre(int id, EnvioTerrestre envioTerrestre)
     {
@@ -73,6 +78,7 @@ public class EnviosTerrestresController : ControllerBase
         return NoContent();
     }
 
+    // Elimina un envío
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEnvioTerrestre(int id)
     {

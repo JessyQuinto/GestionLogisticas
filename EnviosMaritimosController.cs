@@ -10,12 +10,13 @@ public class EnviosMaritimosController : ControllerBase
 {
     private readonly IEnvioMaritimoRepository _envioMaritimoRepository;
 
+    // Inyección del repositorio de envíos marítimos
     public EnviosMaritimosController(IEnvioMaritimoRepository envioMaritimoRepository)
     {
         _envioMaritimoRepository = envioMaritimoRepository;
     }
 
-    // Obtener todos los envíos marítimos
+    // Lista todos los envíos marítimos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvioMaritimo>>> GetEnviosMaritimos()
     {
@@ -23,21 +24,19 @@ public class EnviosMaritimosController : ControllerBase
         return Ok(envios);
     }
 
-    // Obtener un envío marítimo por ID
+    // Devuelve un envío marítimo específico
     [HttpGet("{id}")]
     public async Task<ActionResult<EnvioMaritimo>> GetEnvioMaritimo(int id)
     {
         var envio = await _envioMaritimoRepository.GetByIdAsync(id);
-
         if (envio == null)
         {
             return NotFound();
         }
-
         return Ok(envio);
     }
 
-    // Crear un nuevo envío marítimo
+    // Crea un nuevo envío marítimo
     [HttpPost]
     public async Task<ActionResult<EnvioMaritimo>> PostEnvioMaritimo(EnvioMaritimo envioMaritimo)
     {
@@ -50,7 +49,7 @@ public class EnviosMaritimosController : ControllerBase
         return CreatedAtAction(nameof(GetEnvioMaritimo), new { id = nuevoEnvio.EnvioMaritimoID }, nuevoEnvio);
     }
 
-    // Actualizar un envío marítimo existente
+    // Actualiza un envío marítimo existente
     [HttpPut("{id}")]
     public async Task<IActionResult> PutEnvioMaritimo(int id, EnvioMaritimo envioMaritimo)
     {
@@ -59,19 +58,13 @@ public class EnviosMaritimosController : ControllerBase
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         try
         {
             await _envioMaritimoRepository.UpdateAsync(envioMaritimo);
         }
         catch (System.Exception)
         {
-            var exists = await _envioMaritimoRepository.GetByIdAsync(id) != null;
-            if (!exists)
+            if (await _envioMaritimoRepository.GetByIdAsync(id) == null)
             {
                 return NotFound();
             }
@@ -84,7 +77,7 @@ public class EnviosMaritimosController : ControllerBase
         return NoContent();
     }
 
-    // Eliminar un envío marítimo
+    // Elimina un envío marítimo por su ID
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEnvioMaritimo(int id)
     {
@@ -95,7 +88,6 @@ public class EnviosMaritimosController : ControllerBase
         }
 
         await _envioMaritimoRepository.DeleteAsync(id);
-
         return NoContent();
     }
 }

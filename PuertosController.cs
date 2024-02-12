@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BackendApiLogistica.Data.Models; // Asegúrate de que el namespace sea correcto
+using BackendApiLogistica.Data.Models;
 using BackendApiLogistica.Repositories.Interfaces;
 
 [Route("api/[controller]")]
@@ -15,14 +15,14 @@ public class PuertosController : ControllerBase
         _puertoRepository = puertoRepository;
     }
 
-    // GET: api/Puertos
+    // Obtiene lista de puertos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Puerto>>> GetPuertos()
     {
         return Ok(await _puertoRepository.GetAllAsync());
     }
 
-    // GET: api/Puertos/5
+    // Obtiene un puerto por ID
     [HttpGet("{id}")]
     public async Task<ActionResult<Puerto>> GetPuerto(int id)
     {
@@ -36,7 +36,7 @@ public class PuertosController : ControllerBase
         return puerto;
     }
 
-    // POST: api/Puertos
+    // Crea un puerto
     [HttpPost]
     public async Task<ActionResult<Puerto>> PostPuerto(Puerto puerto)
     {
@@ -49,7 +49,7 @@ public class PuertosController : ControllerBase
         return CreatedAtAction(nameof(GetPuerto), new { id = puerto.PuertoID }, puerto);
     }
 
-    // PUT: api/Puertos/5
+    // Actualiza un puerto
     [HttpPut("{id}")]
     public async Task<IActionResult> PutPuerto(int id, Puerto puerto)
     {
@@ -63,7 +63,7 @@ public class PuertosController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/Puertos/5
+    // Elimina un puerto
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePuerto(int id)
     {

@@ -17,14 +17,14 @@ public class ProductosController : ControllerBase
         _productoRepository = productoRepository;
     }
 
-    // Obtener todos los productos
+    // Lista todos los productos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
     {
         return Ok(await _productoRepository.GetAllAsync());
     }
 
-    // Obtener un producto por ID
+    // Busca un producto por su ID
     [HttpGet("{id}")]
     public async Task<ActionResult<Producto>> GetProductoById(int id)
     {
@@ -36,7 +36,7 @@ public class ProductosController : ControllerBase
         return producto;
     }
 
-    // Crear un nuevo producto
+    // Agrega un nuevo producto
     [HttpPost]
     public async Task<ActionResult<Producto>> PostProducto([FromBody] Producto producto)
     {
@@ -48,7 +48,7 @@ public class ProductosController : ControllerBase
         return CreatedAtAction(nameof(GetProductoById), new { id = nuevoProducto.ProductoID }, nuevoProducto);
     }
 
-    // Actualizar un producto existente
+    // Actualiza un producto existente
     [HttpPut("{id}")]
     public async Task<IActionResult> PutProducto(int id, [FromBody] Producto producto)
     {
@@ -76,7 +76,7 @@ public class ProductosController : ControllerBase
         return NoContent();
     }
 
-    // Eliminar un producto
+    // Elimina un producto
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProducto(int id)
     {
@@ -91,6 +91,7 @@ public class ProductosController : ControllerBase
         return NoContent();
     }
 
+    // Verifica si un producto existe
     private async Task<bool> ProductoExists(int id)
     {
         var producto = await _productoRepository.GetByIdAsync(id);
